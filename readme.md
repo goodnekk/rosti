@@ -1,5 +1,5 @@
 # Rosti
-A crispy software rasteriser
+A crispy software rasteriser written in rust
 
 ## Goals
 - Draw filled polygons and strokes
@@ -16,15 +16,15 @@ A crispy software rasteriser
 - GPU acceleration
 
 ## Todo
-[] Basic Bresenham line
-[] Antialiased line (Xiaolin Wu)
-[] Quadratic & Cubic Beziers
-[] Splines
-[] Line Caps
-[] Line Join (Miter, Bevel, Round)
+[ ] Basic Bresenham line
+[ ] Antialiased line (Xiaolin Wu)
+[ ] Quadratic & Cubic Beziers
+[ ] Splines
+[ ] Line Caps
+[ ] Line Join (Miter, Bevel, Round)
 
-[] Basic Polygon fills
-[] Antialiased Polygon fills
-[] Basic rectangle
-[] Basic circle
-[] Antialiassed circle
+[ ] Basic Polygon fills
+[ ] Antialiased Polygon fills
+[ ] Basic rectangle
+[ ] Basic circle
+[ ] Antialiassed circle
