@@ -4,7 +4,7 @@ A crispy software rasteriser written in rust
 ## Goals
 - Draw filled polygons and strokes
 - Platform independent
-- Fast
+- Fast (at least for a software rasterizer)
 - No bloat & minimal dependencies
 - Antialiassing
 - Well documented API

@@ -4,15 +4,15 @@ pub use geometry::*;
 pub mod raster;
 pub use raster::*;
 
-pub fn naive_line(line: Line, raster: &mut GreyscaleRaster) {
-    let rise = (line.y2 - line.y1);
-    let run = (line.x2 - line.x1);
+pub fn draw_dda_line(line: Line, raster: &mut GreyscaleRaster) {
+    let rise = line.y2 - line.y1;
+    let run = line.x2 - line.x1;
     
     //Get rounded x and ys
-    let mut x1 = line.x1.round() as usize;
-    let mut y1 = line.y1.round() as usize;
-    let mut x2 = line.x2.round() as usize;
-    let mut y2 = line.y2.round() as usize;
+    let mut x1 = line.x1.round() as u32;
+    let mut y1 = line.y1.round() as u32;
+    let mut x2 = line.x2.round() as u32;
+    let mut y2 = line.y2.round() as u32;
 
     //Swap around directions
     if x1 > x2 {
@@ -27,7 +27,6 @@ pub fn naive_line(line: Line, raster: &mut GreyscaleRaster) {
         y2 = t;
     }
 
-
     if run == 0.0 {
         //vertical case
         for y in y1..y2+1 {
@@ -40,16 +39,15 @@ pub fn naive_line(line: Line, raster: &mut GreyscaleRaster) {
         if m<=1.0 && m >= -1.0 {
             //more horizontal than vertical, so find y for each x
             for x in x1..x2+1 {
-                let y = (m * x as f32 + b).round() as usize;
-                raster.set_pixel(x, y, 255);
+                let y = (m * x as f32 + b).round();
+                raster.set_pixel(x, y as u32, 255);
             }
         } else {
             //more vertical than horizontal, so find x for each y
             for y in y1..y2+1 {
-                let x = ((y as f32 - b) / m).round() as usize;
-                raster.set_pixel(x, y, 255);
+                let x = ((y as f32 - b) / m).round();
+                raster.set_pixel(x as u32, y, 255);
             }
         }
-
     }
 }

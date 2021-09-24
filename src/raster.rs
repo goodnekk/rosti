@@ -13,12 +13,12 @@ impl GreyscaleRaster {
         }
     }
 
-    pub fn set_pixel(&mut self, x: usize, y: usize, pixel: u8) {
-        self.data[y*self.width + x] = pixel;
+    pub fn set_pixel(&mut self, x: u32, y: u32, pixel: u8) {
+        self.data[y as usize*self.width + x as usize] = pixel;
     }
 
-    pub fn get_pixel(&self, x: usize, y: usize) -> u8 {
-        self.data[y*self.width + x]
+    pub fn get_pixel(&self, x: u32, y: u32) -> u8 {
+        self.data[y as usize*self.width + x as usize]
     }
 
     pub fn as_raw_data(&self) -> &Vec<u8> {
@@ -30,15 +30,15 @@ impl GreyscaleRaster {
             let mut line = String::from("");
 
             for x in 0..self.width {
-                let pixel = self.get_pixel(x, y);
+                let pixel = self.get_pixel(x as u32, y as u32);
                 let c = match pixel {
-                    0..=32    => ' ',
-                    32..=64   => '.',
-                    64..=96   => '-',
-                    96..=128  => '=',
-                    128..=160 => '+',
-                    160..=192 => '*',
-                    192..=224 => '#',
+                    0..=31    => ' ',
+                    32..=63   => '.',
+                    64..=95   => '-',
+                    96..=127  => '=',
+                    128..=159 => '+',
+                    160..=191 => '*',
+                    192..=223 => '#',
                     224..=255 => '%',
                 };
                 line.push(c);
