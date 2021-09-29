@@ -13,6 +13,10 @@ impl GreyscaleRaster {
         }
     }
 
+    pub fn get_size(&self) -> (usize, usize) {
+        return (self.width, self.height)
+    }
+
     pub fn set_pixel(&mut self, x: u32, y: u32, pixel: u8) {
         self.data[y as usize*self.width + x as usize] = pixel;
     }

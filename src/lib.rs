@@ -1,18 +1,37 @@
-pub mod geometry;
-pub use geometry::*;
+pub mod path;
+pub use path::*;
 
 pub mod raster;
 pub use raster::*;
 
-pub fn draw_dda_line(line: Line, raster: &mut GreyscaleRaster) {
-    let rise = line.y2 - line.y1;
-    let run = line.x2 - line.x1;
+
+pub fn draw_path_pix(path: Path, raster: &mut GreyscaleRaster) {
+    let points = path.as_points();
+    
+    for p in points {
+        raster.set_pixel(p.x.round() as u32, p.y.round() as u32, 255);
+    }
+}
+
+pub fn draw_dda_path(path: Path, raster: &mut GreyscaleRaster) {
+    let points = path.as_points();
+    
+    for s in points.windows(2) {
+        let prev = s[0];
+        let next = s[1];
+        draw_dda_line(prev, next, raster);
+    }
+}
+
+pub fn draw_dda_line(a: Point, b: Point, raster: &mut GreyscaleRaster) {
+    let rise = b.y - a.y;
+    let run = b.x - a.x;
     
     //Get rounded x and ys
-    let mut x1 = line.x1.round() as u32;
-    let mut y1 = line.y1.round() as u32;
-    let mut x2 = line.x2.round() as u32;
-    let mut y2 = line.y2.round() as u32;
+    let mut x1 = a.x.round() as u32;
+    let mut y1 = a.y.round() as u32;
+    let mut x2 = b.x.round() as u32;
+    let mut y2 = b.y.round() as u32;
 
     //Swap around directions
     if x1 > x2 {
@@ -34,7 +53,7 @@ pub fn draw_dda_line(line: Line, raster: &mut GreyscaleRaster) {
         }
     } else {
         let m = rise / run; //slope
-        let b = line.y1 - m * line.x1;//offset
+        let b = a.y - m * a.x;//offset
         
         if m<=1.0 && m >= -1.0 {
             //more horizontal than vertical, so find y for each x

@@ -18,15 +18,18 @@ A crispy software rasteriser written in rust
 
 ## Todo
 
-#### Strokes
+#### Path rendering
 - [x] Naive line
 - [ ] Basic Bresenham line
 - [ ] Antialiased line (Xiaolin Wu)
-- [ ] Quadratic & Cubic Beziers
-- [ ] Polynomials & Splines
-- [ ] Circles
+
+#### Geometry
+- [x] Quadratic & Cubic Beziers
+- [ ] Generate stroke width geometry
 - [ ] Line Caps
 - [ ] Line Join (Miter, Bevel, Round)
+- [ ] Polynomials & Splines
+- [ ] Circles
 
 #### Fills
 - [ ] Basic Polygon fills
