@@ -15,6 +15,5 @@ pub fn save_raster_as_image(filename: &str, raster: GreyscaleRaster){
         }    
     }
 
-
     imgbuf.save(filename).unwrap();
 }

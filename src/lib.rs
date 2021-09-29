@@ -4,6 +4,8 @@ pub use path::*;
 pub mod raster;
 pub use raster::*;
 
+pub mod fill;
+pub use fill::*;
 
 pub fn draw_path_pix(path: Path, raster: &mut GreyscaleRaster) {
     let points = path.as_points();

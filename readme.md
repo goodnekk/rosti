@@ -32,7 +32,7 @@ A crispy software rasteriser written in rust
 - [ ] Circles
 
 #### Fills
-- [ ] Basic Polygon fills
+- [x] Basic Polygon fills
 - [ ] Antialiased Polygon fills
 - [ ] Basic rectangle
 - [ ] Basic circle
