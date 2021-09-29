@@ -11,7 +11,7 @@ pub fn draw_path_pix(path: Path, raster: &mut GreyscaleRaster) {
     let points = path.as_points();
     
     for p in points {
-        raster.set_pixel(p.x.round() as u32, p.y.round() as u32, 255);
+        raster.set_pixel(p.x.round() as usize, p.y.round() as usize, 255);
     }
 }
 
@@ -30,10 +30,10 @@ pub fn draw_dda_line(a: Point, b: Point, raster: &mut GreyscaleRaster) {
     let run = b.x - a.x;
     
     //Get rounded x and ys
-    let mut x1 = a.x.round() as u32;
-    let mut y1 = a.y.round() as u32;
-    let mut x2 = b.x.round() as u32;
-    let mut y2 = b.y.round() as u32;
+    let mut x1 = a.x.round() as usize;
+    let mut y1 = a.y.round() as usize;
+    let mut x2 = b.x.round() as usize;
+    let mut y2 = b.y.round() as usize;
 
     //Swap around directions
     if x1 > x2 {
@@ -61,13 +61,13 @@ pub fn draw_dda_line(a: Point, b: Point, raster: &mut GreyscaleRaster) {
             //more horizontal than vertical, so find y for each x
             for x in x1..x2+1 {
                 let y = (m * x as f32 + b).round();
-                raster.set_pixel(x, y as u32, 255);
+                raster.set_pixel(x, y as usize, 255);
             }
         } else {
             //more vertical than horizontal, so find x for each y
             for y in y1..y2+1 {
                 let x = ((y as f32 - b) / m).round();
-                raster.set_pixel(x as u32, y, 255);
+                raster.set_pixel(x as usize, y, 255);
             }
         }
     }

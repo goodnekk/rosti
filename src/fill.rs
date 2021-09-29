@@ -1,72 +1,86 @@
 use crate::path::{Path, Point};
 use crate::raster::GreyscaleRaster;
 
-pub fn fill_path(mut path: Path, raster: &mut GreyscaleRaster) {
-    let mut vertical_slices = sort_path_into_vertical_slices(path);
-
-    let mut active_vertical_slices = Vec::new();
-    //scanline rasterize slices
+pub fn fill_path(path: &Path, raster: &mut GreyscaleRaster) {
     
-    let (width, height) = raster.get_size();
 
+    //Sort path into vertical slices
+    let mut vertical_slices = sort_path_into_vertical_slices(&path);
+
+    //Get vertical bounds
+    let (width, height) = raster.get_size();
+    let mut min_y = height;
+    let mut max_y = 0;
+
+    for slice in vertical_slices.iter() {
+        let first_y = slice.first().unwrap().y.round() as usize;
+        let last_y = slice.last().unwrap().y.round() as usize;
+        if first_y > max_y {
+            max_y = first_y;
+        }
+
+        if last_y < min_y {
+            min_y = last_y;
+        }
+    }
+    
+    //let mut active_vertical_slice_ids = Vec::new();
     let mut row_intersections = Vec::with_capacity(vertical_slices.len());
     let mut to_remove = Vec::new();
-    let mut to_insert = Vec::new();
 
-    //Todo: Find top and bottom of figure
+    
+    let mut raster_raw_data = raster.as_raw_data_mut();
 
-    for y in 0..height {
+    for y in min_y..max_y {
         let float_y = y as f32;
         
-        //check if we should add any of the vertical slices
-        for i in 0..vertical_slices.len() {
-            let top = vertical_slices[i].last().unwrap();
-            if top.y < float_y {
-                to_insert.push(i);
-            }
-        }
+        for (i, slice) in vertical_slices.iter_mut().enumerate() {
+            let prev_point = slice[slice.len() - 1];
+            let next_point = slice[slice.len() - 2];
 
-        for i in to_insert.iter().rev() {
-            active_vertical_slices.push(vertical_slices.remove(*i));
-        }
-        
-        for (i, slice) in active_vertical_slices.iter_mut().enumerate() {
-            let mut prev_point = slice[slice.len() - 1];
-            let mut next_point = slice[slice.len() - 2];
-
-            let x_intersection = prev_point.x + (float_y-prev_point.y) / (next_point.y-prev_point.y) * (next_point.x-prev_point.x); 
-            row_intersections.push(x_intersection as usize);
-            
-            //check if we need to progress next round
-            if next_point.y < float_y + 1.0 {
-                if slice.len() > 2 {
-                    slice.pop();
-                } else {
-                    to_remove.push(i);
-                }
+            if prev_point.y < float_y {
+                let x_intersection = prev_point.x + (float_y-prev_point.y) / (next_point.y-prev_point.y) * (next_point.x-prev_point.x); 
+                row_intersections.push(x_intersection as usize);
+                
+                //check if we need to progress next round
+                if next_point.y < float_y + 1.0 {
+                    if slice.len() > 2 {
+                        slice.pop();
+                    } else {
+                        to_remove.push(i);
+                    }
+                }    
             }
         }
 
         for i in to_remove.iter().rev() {
-            active_vertical_slices.remove(*i);
+            vertical_slices.remove(*i);
         }
 
         row_intersections.sort();
-        for i in (0..row_intersections.len()).step_by(2) {
-            let left = row_intersections[i];
-            let right = row_intersections[i+1];
-            for x in left..right {
-                raster.set_pixel(x as u32, y as u32, 255);
-            }
-        }
 
+        //TODO: OPTIMIZE THIS
+        let data_offset = y * width;
+        for i in (0..row_intersections.len()).step_by(2) {
+            let left = row_intersections[i]     + data_offset;
+            let right = row_intersections[i+1]  + data_offset;
+            
+            //This is pretty much as fast as it gets
+            for pix in &mut raster_raw_data[left..right] {
+                *pix = 255;
+            }
+
+            // for x in left..right {
+            //    raster_raw_data[x] = 255;
+            //     //raster.set_pixel(x, y, 255);
+            // }
+        }
         row_intersections.clear();
         to_remove.clear();
-        to_insert.clear();
     }
 }
 
-pub fn sort_path_into_vertical_slices(path: Path) -> Vec<Vec<Point>> {
+pub fn sort_path_into_vertical_slices(path: &Path) -> Vec<Vec<Point>> {
     let points = path.as_points();
 
     //Convert to vertical slices
