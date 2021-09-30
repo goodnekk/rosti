@@ -2,7 +2,7 @@ use rosti::*;
 
 mod export_image;
 
-use std::time::{Duration, Instant};
+use std::time::{Instant};
 
 
 fn main() {
@@ -13,13 +13,19 @@ fn main() {
     path.cubic_curve_to(780.0, 780.0, 20.0, 780.0, 20.0, 400.0);
     path.close();
 
-    for _ in 0..100 {
+    let mut total_time = 0;
+
+    for _ in 0..1000 {
         let now = Instant::now();
 
         fill_path(&path, &mut raster);
         //draw_dda_path(path, &mut raster);
-        println!("rasterization took: {} ns", now.elapsed().as_nanos());
+        total_time += now.elapsed().as_nanos();
     }
+
+    let average_time = total_time / 1000;
+
+    println!("rasterization took on average: {} ns", average_time);
     
     export_image::save_raster_as_image("test_output/filled_curves.png", raster);
     

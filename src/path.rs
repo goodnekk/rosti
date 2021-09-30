@@ -1,5 +1,3 @@
-const SEG: f32 = 0.3; //minimum segment size for curves
-
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
     pub x: f32, 
@@ -101,15 +99,14 @@ impl Path {
                 },
                 PathOp::QuadraticCurve {a, b} => {
                     let new_points = get_quadratic_bezier_points_recursive(points.last().unwrap(), a, b);
-                    println!("generated points {}", new_points.len());
+                    //println!("generated points {}", new_points.len());
                     points.extend_from_slice(&new_points);
                 },
                 PathOp::CubicCurve {a, b, c} => {
                     let new_points = get_cubic_bezier_points_recursive(points.last().unwrap(), a, b, c);
-                    println!("generated points {}", new_points.len());
+                    //println!("generated points {}", new_points.len());
                     points.extend_from_slice(&new_points);
                 },
-                _=>{}
             }
         }
 
@@ -149,38 +146,38 @@ fn get_cubic_bezier_points_recursive(a: &Point, b: &Point, c: &Point, d: &Point)
     }
 }
 
-fn get_cubic_bezier_points(a: &Point, b: &Point, c: &Point, d: &Point, sub_div: usize) -> Vec<Point>{
-    let mut points = Vec::new();
+// fn get_cubic_bezier_points(a: &Point, b: &Point, c: &Point, d: &Point, sub_div: usize) -> Vec<Point>{
+//     let mut points = Vec::new();
 
-    let step_size = 1.0 / sub_div as f32;
+//     let step_size = 1.0 / sub_div as f32;
     
-    let mut last_point = a.clone();
+//     let mut last_point = a.clone();
     
-    let mut step = step_size;
+//     let mut step = step_size;
 
-    for _ in 0..sub_div {
-        let new_point = get_cubic_bezier_point_at_offset(a, b, c, d, step);
-        last_point = new_point.clone();
-        points.push(new_point);
-        step += step_size;
-    }
+//     for _ in 0..sub_div {
+//         let new_point = get_cubic_bezier_point_at_offset(a, b, c, d, step);
+//         last_point = new_point.clone();
+//         points.push(new_point);
+//         step += step_size;
+//     }
 
-    return points
-}
+//     return points
+// }
 
-fn get_cubic_bezier_point_at_offset(a: &Point, b: &Point, c: &Point, d: &Point, t: f32) -> Point {
-    let mt = 1.0 - t;
+// fn get_cubic_bezier_point_at_offset(a: &Point, b: &Point, c: &Point, d: &Point, t: f32) -> Point {
+//     let mt = 1.0 - t;
         
-    let f1 = mt*mt*mt;
-    let f2 = 3.0*mt*mt*t;
-    let f3 = 3.0*mt*t*t;
-    let f4 = t*t*t;
+//     let f1 = mt*mt*mt;
+//     let f2 = 3.0*mt*mt*t;
+//     let f3 = 3.0*mt*t*t;
+//     let f4 = t*t*t;
 
-    let x = f1*a.x + f2*b.x + f3*c.x + f4*d.x;
-    let y = f1*a.y + f2*b.y + f3*c.y + f4*d.y;
+//     let x = f1*a.x + f2*b.x + f3*c.x + f4*d.x;
+//     let y = f1*a.y + f2*b.y + f3*c.y + f4*d.y;
 
-    Point {x, y}
-}
+//     Point {x, y}
+// }
 
 // Compute Quadratic Bezier components
 fn get_quadratic_bezier_points_recursive(a: &Point, b: &Point, c: &Point) -> Vec<Point>{
@@ -203,34 +200,34 @@ fn get_quadratic_bezier_points_recursive(a: &Point, b: &Point, c: &Point) -> Vec
     }
 }
 
-fn get_quadratic_bezier_points(a: &Point, b: &Point, c: &Point, sub_div: usize) -> Vec<Point>{
-    let mut points = Vec::new();
+// fn get_quadratic_bezier_points(a: &Point, b: &Point, c: &Point, sub_div: usize) -> Vec<Point>{
+//     let mut points = Vec::new();
 
-    let step_size = 1.0 / sub_div as f32;
+//     let step_size = 1.0 / sub_div as f32;
     
-    let mut last_point = a.clone();
+//     let mut last_point = a.clone();
     
-    let mut step = step_size;
+//     let mut step = step_size;
 
-    for _ in 0..sub_div {
-        let new_point = get_cubic_quadratic_point_at_offset(a, b, c, step);
-        last_point = new_point.clone();
-        points.push(new_point);
-        step += step_size;
-    }
+//     for _ in 0..sub_div {
+//         let new_point = get_cubic_quadratic_point_at_offset(a, b, c, step);
+//         last_point = new_point.clone();
+//         points.push(new_point);
+//         step += step_size;
+//     }
 
-    return points
-}
+//     return points
+// }
 
-fn get_cubic_quadratic_point_at_offset(a: &Point, b: &Point, c: &Point, t: f32) -> Point {
-    let mt = 1.0 - t;
+// fn get_cubic_quadratic_point_at_offset(a: &Point, b: &Point, c: &Point, t: f32) -> Point {
+//     let mt = 1.0 - t;
         
-    let f1 = mt*mt;
-    let f2 = 2.0*mt*t;
-    let f3 = t*t;
+//     let f1 = mt*mt;
+//     let f2 = 2.0*mt*t;
+//     let f3 = t*t;
 
-    let x = f1*a.x + f2*b.x + f3*c.x;
-    let y = f1*a.y + f2*b.y + f3*c.y;
+//     let x = f1*a.x + f2*b.x + f3*c.x;
+//     let y = f1*a.y + f2*b.y + f3*c.y;
 
-    Point {x, y}
-}
+//     Point {x, y}
+// }
