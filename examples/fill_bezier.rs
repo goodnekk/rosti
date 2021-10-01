@@ -18,7 +18,7 @@ fn main() {
     for _ in 0..1000 {
         let now = Instant::now();
 
-        fill_path(&path, &mut raster);
+        aa_fill_path(&path, &mut raster);
         //draw_dda_path(path, &mut raster);
         total_time += now.elapsed().as_nanos();
     }

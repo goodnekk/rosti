@@ -1,7 +1,7 @@
 use crate::path::{Path, Point};
 use crate::raster::GreyscaleRaster;
 
-pub fn fill_path(path: &Path, raster: &mut GreyscaleRaster) {
+pub fn fast_fill_path(path: &Path, raster: &mut GreyscaleRaster) {
 
     //Sort path into vertical slices
     let mut vertical_slices = sort_path_into_vertical_slices(&path);
@@ -64,6 +64,81 @@ pub fn fill_path(path: &Path, raster: &mut GreyscaleRaster) {
                 }
             }
         }
+        row_intersections.clear();
+        to_remove.clear();
+    }
+}
+
+pub fn aa_fill_path(path: &Path, raster: &mut GreyscaleRaster) {
+
+    //Sort path into vertical slices
+    let mut vertical_slices = sort_path_into_vertical_slices(&path);
+
+    //Get vertical bounds
+    let (width, height) = raster.get_size();
+    let mut min_y = height;
+    let mut max_y = 0;
+
+    for slice in vertical_slices.iter() {
+        let first_y = slice.first().unwrap().y.round() as usize;
+        let last_y = slice.last().unwrap().y.round() as usize;
+        if first_y > max_y {
+            max_y = first_y;
+        }
+
+        if last_y < min_y {
+            min_y = last_y;
+        }
+    }
+    
+    //let mut active_vertical_slice_ids = Vec::new();
+    let mut row_intersections = Vec::with_capacity(vertical_slices.len());
+    //let mut prev_row_intersections = Vec::with_capacity(vertical_slices.len());
+    let mut to_remove = Vec::with_capacity(vertical_slices.len());
+
+    let raster_raw_data = raster.as_raw_data_mut();
+
+    for y in min_y..max_y {
+        let float_y = y as f32;
+        
+        for (i, slice) in vertical_slices.iter_mut().enumerate() {
+            if let [.., next_point, prev_point] = &slice[..] {
+                if prev_point.y < float_y {
+                    let x_intersection = prev_point.x + (float_y-prev_point.y) / (next_point.y-prev_point.y) * (next_point.x-prev_point.x); 
+                    row_intersections.push((x_intersection as usize, (x_intersection.fract() * 255.0) as u8));
+                    
+                    //check if we need to progress next round
+                    if next_point.y < float_y + 1.0 {
+                        if slice.len() > 2 {
+                            slice.pop();
+                        } else {
+                            to_remove.push(i);
+                        }
+                    }
+                }
+            }
+        }
+
+        for i in to_remove.iter().rev() {
+            vertical_slices.remove(*i);
+        }
+
+        row_intersections.sort();
+
+        let data_offset = y * width;
+        for chunk in row_intersections.chunks_exact(2) {
+            if let [left, right] = chunk {
+                let left_offset = left.0 + data_offset;
+                let right_offset = right.0 + data_offset;
+                for pix in &mut raster_raw_data[left_offset..right_offset] {
+                    *pix = 255;
+                }
+                raster_raw_data[left_offset-1] = 255 - left.1;
+                raster_raw_data[right_offset] = right.1;
+            }
+        }
+
+        //prev_row_intersections = row_intersections.clone();
         row_intersections.clear();
         to_remove.clear();
     }
